@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Watch Class</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body{
+      margin:0;
+      background:linear-gradient(135deg,#0f0f1a,#1a1a2e);
+      font-family:Poppins;
+      color:white;
+      padding:20px;
+    }
+
+    h2{
+      color:#FFD700;
+    }
+
+    video{
+      width:100%;
+      border-radius:15px;
+      margin-top:15px;
+      box-shadow:0 0 30px rgba(255,215,0,0.2);
+    }
+
+    button{
+      margin-top:20px;
+      padding:10px 20px;
+      border:none;
+      border-radius:10px;
+      background:#FFD700;
+      font-weight:bold;
+      cursor:pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h2 id="videoTitle"></h2>
+
+<video controls>
+  <source id="videoSource" src="" type="video/mp4">
+</video>
+
+<button onclick="goBack()">⬅ Back to Classes</button>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const video = params.get("video");
+  const title = params.get("title");
+
+  document.getElementById("videoTitle").innerText = title;
+  document.getElementById("videoSource").src = video;
+
+  function goBack(){
+    window.location.href="recorded.html";
+  }
+</script>
+
+</body>
+</html>
+
