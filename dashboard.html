@@ -248,35 +248,6 @@
   </div>
 </div>
 
-
-    <div class="slide">
-      <img src="manjunath.JPG">
-      <p>"The harder you work for something, the greater you'll feel when you achieve it."</p>
-    </div>
-
-    <div class="slide">
-      <img src="mot1.jpg">
-      <p>"Success doesn’t come from comfort zones."</p>
-    </div>
-
-    <div class="slide">
-      <img src="mot2.jpg">
-      <p>"Discipline today. Result tomorrow."</p>
-    </div>
-
-    <div class="slide">
-      <img src="mot3.jpg">
-      <p>"Fear of exam? Good. Use it."</p>
-    </div>
-
-    <div class="slide">
-      <img src="mot4.jpg">
-      <p>"90+ is not luck. It is preparation."</p>
-    </div>
-
-  </div>
-</div>
-
   <!-- Batches -->
   <div class="card">
     <h3>Batches</h3>
@@ -414,22 +385,7 @@ console.log("Payment Status:", data.paymentStatus);
     window.location.href="tel:02269719375";
   }
 // Auto horizontal scroll
-const slider = document.querySelector('.slider-container');
 
-let scrollAmount = 0;
-
-setInterval(() => {
-  if(slider){
-    scrollAmount += 270;
-    if(scrollAmount >= slider.scrollWidth){
-      scrollAmount = 0;
-    }
-    slider.scrollTo({
-      left: scrollAmount,
-      behavior: "smooth"
-    });
-  }
-}, 4000);
 // Netflix Style Infinite Carousel
 const track = document.querySelector('.carousel-track');
 let slides = Array.from(document.querySelectorAll('.carousel-item'));
@@ -453,25 +409,6 @@ if(track){
     track.style.transform = `translateX(-${currentIndex * 100}%)`;
     slides.forEach(slide => slide.classList.remove("active"));
     slides[currentIndex].classList.add("active");
-  }
-
-  updateSlidePosition();
-
-  const track = document.querySelector(".carousel-track");
-let slideIndex = 0;
-const totalSlides = document.querySelectorAll(".carousel-item").length;
-
-function autoSlide() {
-  slideIndex++;
-  if (slideIndex >= totalSlides) {
-    slideIndex = 0;
-  }
-  track.style.transform = "translateX(-" + (slideIndex * 100) + "%)";
-}
-
-setInterval(autoSlide, 3000);
-
-  
 
 }
 
