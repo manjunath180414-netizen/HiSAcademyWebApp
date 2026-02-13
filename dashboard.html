@@ -109,6 +109,33 @@
     .live-btn{background:#FFD700;color:black;}
     .record-btn{background:#1f2937;color:white;border:1px solid #FFD700;}
     .call-btn{background:#25D366;color:white;}
+.slider-container{
+  display:flex;
+  overflow-x:auto;
+  gap:15px;
+  scroll-snap-type:x mandatory;
+}
+
+.slide{
+  min-width:250px;
+  background:#1f2937;
+  padding:15px;
+  border-radius:15px;
+  text-align:center;
+  scroll-snap-align:start;
+  box-shadow:0 0 20px rgba(255,215,0,0.1);
+}
+
+.slide img{
+  width:100%;
+  border-radius:10px;
+  margin-bottom:10px;
+}
+
+.slide p{
+  font-style:italic;
+  font-size:14px;
+}
 
   </style>
 </head>
