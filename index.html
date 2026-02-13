@@ -117,23 +117,25 @@
 
   function checkInputs() {
     if (nameInput.value && phoneInput.value && mediumSelect.value) {
-      googleBtn.style.display = "block";
-    } else {
-      googleBtn.style.display = "none";
-    }
-  }
-
-  nameInput.addEventListener("input", checkInputs);
-  phoneInput.addEventListener("input", checkInputs);
-  mediumSelect.addEventListener("change", checkInputs);
-
-  googleBtn.addEventListener("click", () => {
-    auth.signInWithRedictor(provider)
-      auth.getRedirectResult().then((result) => {
-  if (result.user) {
-    window.location.href = "courses.html";
-  }
+      googleBtn.addEventListener("click", () => {
+  auth.signInWithRedirect(provider);
 });
+
+auth.getRedirectResult()
+  .then((result) => {
+    if (result.user) {
+      localStorage.setItem("studentName", nameInput.value);
+      localStorage.setItem("studentPhone", phoneInput.value);
+      localStorage.setItem("studentMedium", mediumSelect.value);
+      localStorage.setItem("studentEmail", result.user.email);
+
+      window.location.href = "courses.html";
+    }
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+
 
 
         // Save user details in localStorage
