@@ -323,6 +323,23 @@ console.log("Payment Status:", data.paymentStatus);
   function callNow(){
     window.location.href="tel:02269719375";
   }
+// Auto horizontal scroll
+const slider = document.querySelector('.slider-container');
+
+let scrollAmount = 0;
+
+setInterval(() => {
+  if(slider){
+    scrollAmount += 270;
+    if(scrollAmount >= slider.scrollWidth){
+      scrollAmount = 0;
+    }
+    slider.scrollTo({
+      left: scrollAmount,
+      behavior: "smooth"
+    });
+  }
+}, 4000);
 
 </script>
 
