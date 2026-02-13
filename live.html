@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Class</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body{
+      margin:0;
+      background:linear-gradient(135deg,#0f0f1a,#1a1a2e);
+      font-family:Poppins;
+      color:white;
+      padding:20px;
+    }
+
+    .live-badge{
+      background:red;
+      padding:5px 10px;
+      border-radius:8px;
+      font-size:12px;
+      display:inline-block;
+      margin-bottom:10px;
+    }
+
+    h2{
+      color:#FFD700;
+    }
+
+    video, iframe{
+      width:100%;
+      border-radius:15px;
+      margin-top:15px;
+      box-shadow:0 0 30px rgba(255,0,0,0.3);
+    }
+
+    .info{
+      margin-top:15px;
+      opacity:0.8;
+    }
+
+    button{
+      margin-top:20px;
+      padding:10px 20px;
+      border:none;
+      border-radius:10px;
+      background:#FFD700;
+      font-weight:bold;
+      cursor:pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="live-badge">🔴 LIVE NOW</div>
+
+<h2>SSLC 2026 – Maths Strategy Session</h2>
+
+<!-- OPTION 1: Local Live Video -->
+<video controls autoplay>
+  <source src="live.mp4" type="video/mp4">
+</video>
+
+<!-- OPTION 2: YouTube Live (Replace with your link)
+<iframe src="https://www.youtube.com/embed/YOUR_LIVE_STREAM_ID" 
+allowfullscreen></iframe>
+-->
+
+<div class="info">
+  Mentor: Manjunath Sir <br>
+  Topic: Important Exam Strategy <br>
+  Duration: 1hr 30min
+</div>
+
+<button onclick="goBack()">⬅ Back to Dashboard</button>
+
+<script>
+  function goBack(){
+    window.location.href="dashboard.html";
+  }
+</script>
+
+</body>
+</html>
