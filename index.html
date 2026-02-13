@@ -128,7 +128,7 @@
   mediumSelect.addEventListener("change", checkInputs);
 
   googleBtn.addEventListener("click", () => {
-    auth.signInWithPopup(provider)
+    auth.signInWithRedictor(provider)
       .then((result) => {
         const user = result.user;
 
