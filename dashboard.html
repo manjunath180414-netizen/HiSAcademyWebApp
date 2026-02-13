@@ -143,13 +143,21 @@
   margin-top: 15px;
 }
 
+.carousel {
+  width: 100%;
+  overflow: hidden;
+  margin-top: 15px;
+}
+
 .carousel-track {
   display: flex;
-  transition: transform 0.5s ease-in-out;
+  width: 500%; /* 5 slides */
+  transition: transform 0.6s ease-in-out;
 }
 
 .carousel-item {
-  flex: 0 0 100%;
+  width: 100%;
+  flex: 1 0 100%;
   padding: 10px;
   box-sizing: border-box;
 }
@@ -164,7 +172,7 @@
 
 .carousel-card img {
   width: 100%;
-  height: 170px;
+  height: 160px;
   object-fit: cover;
   border-radius: 10px;
 }
@@ -174,6 +182,7 @@
   font-style: italic;
   font-size: 14px;
 }
+
 
 
   </style>
@@ -193,46 +202,52 @@
     <div class="countdown" id="countdown"></div>
   </div>
   
-<!-- Motivation Section -->
-<div class="card">
-  <h3 class="highlight">🔥 Stay Focused. Stay Hungry.</h3>
 
-  <div class="slider-container">
     <!-- Motivation Carousel -->
 <div class="card">
   <h3 class="highlight">🔥 Stay Focused. Stay Hungry.</h3>
 
-  <div class="carousel">
-    <div class="carousel-track">
+<div class="carousel">
+  <div class="carousel-track">
 
-      <div class="carousel-item">
+    <div class="carousel-item">
+      <div class="carousel-card">
         <img src="manjunath.JPG">
         <p>"The harder you work for something, the greater you'll feel when you achieve it."</p>
       </div>
+    </div>
 
-      <div class="carousel-item">
+    <div class="carousel-item">
+      <div class="carousel-card">
         <img src="mot1.jpg">
         <p>"Success doesn’t come from comfort zones."</p>
       </div>
+    </div>
 
-      <div class="carousel-item">
+    <div class="carousel-item">
+      <div class="carousel-card">
         <img src="mot2.jpg">
         <p>"Discipline today. Result tomorrow."</p>
       </div>
+    </div>
 
-      <div class="carousel-item">
+    <div class="carousel-item">
+      <div class="carousel-card">
         <img src="mot3.jpg">
         <p>"Fear of exam? Good. Use it."</p>
       </div>
+    </div>
 
-      <div class="carousel-item">
+    <div class="carousel-item">
+      <div class="carousel-card">
         <img src="mot4.jpg">
         <p>"90+ is preparation, not luck."</p>
       </div>
-
     </div>
+
   </div>
 </div>
+
 
     <div class="slide">
       <img src="manjunath.JPG">
@@ -442,19 +457,21 @@ if(track){
 
   updateSlidePosition();
 
-  setInterval(() => {
-    currentIndex++;
-    track.style.transition = "transform 0.6s ease-in-out";
-    updateSlidePosition();
+  const track = document.querySelector(".carousel-track");
+let slideIndex = 0;
+const totalSlides = document.querySelectorAll(".carousel-item").length;
 
-    if (currentIndex === slides.length - 1) {
-      setTimeout(() => {
-        track.style.transition = "none";
-        currentIndex = 1;
-        updateSlidePosition();
-      }, 600);
-    }
-  }, 3500);
+function autoSlide() {
+  slideIndex++;
+  if (slideIndex >= totalSlides) {
+    slideIndex = 0;
+  }
+  track.style.transform = "translateX(-" + (slideIndex * 100) + "%)";
+}
+
+setInterval(autoSlide, 3000);
+
+  
 
 }
 
