@@ -1,17 +1,13 @@
-<!DOCTYPE html>
+        <!DOCTYPE html>
 <html>
 <head>
   <title>HiS Academy Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
   <style>
     body {
       margin: 0;
-      font-family: 'Poppins', sans-serif;
+      font-family: Arial, sans-serif;
       background: linear-gradient(135deg, #0f0f1a, #1a1a2e);
       color: white;
       display: flex;
@@ -26,13 +22,13 @@
       background: #111827;
       padding: 30px;
       border-radius: 20px;
-      box-shadow: 0 0 30px rgba(255, 204, 0, 0.2);
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 25px;
       color: #FFD700;
+      margin-bottom: 20px;
     }
 
     input, select {
@@ -41,13 +37,11 @@
       margin-bottom: 15px;
       border-radius: 10px;
       border: none;
-      outline: none;
       background: #1f2937;
       color: white;
     }
 
-    .google-btn {
-      display: none;
+    button {
       width: 100%;
       padding: 12px;
       border-radius: 10px;
@@ -56,28 +50,22 @@
       color: black;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.3s;
+      display: none;
     }
 
-    .google-btn:hover {
+    button:hover {
       background: #ffcc00;
-    }
-
-    .footer {
-      text-align: center;
-      margin-top: 15px;
-      font-size: 12px;
-      opacity: 0.6;
     }
   </style>
 </head>
+
 <body>
 
 <div class="container">
   <h2>Welcome to HiS Academy</h2>
 
-  <input type="text" id="name" placeholder="Enter Your Name" />
-  <input type="tel" id="phone" placeholder="Enter Phone Number" />
+  <input type="text" id="name" placeholder="Enter Name">
+  <input type="tel" id="phone" placeholder="Enter Phone Number">
 
   <select id="medium">
     <option value="">Select Medium</option>
@@ -85,17 +73,16 @@
     <option>Kannada</option>
   </select>
 
-  <button class="google-btn" id="googleLogin">
-    Login with Google
-  </button>
-
-  <div class="footer">
-    Secure Login via Firebase
-  </div>
+  <button id="googleBtn">Login with Google</button>
 </div>
 
-<script>
-  // Firebase Config
+<!-- Firebase v9 Modular SDK -->
+<script type="module">
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup } 
+  from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
   const firebaseConfig = {
     apiKey: "AIzaSyCehyZQukDfslKTY_u9yXcUrzGtMNHvuPA",
     authDomain: "his-academy.firebaseapp.com",
@@ -106,14 +93,14 @@
     measurementId: "G-8WPMS7H33F"
   };
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const provider = new firebase.auth.GoogleAuthProvider();
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
 
   const nameInput = document.getElementById("name");
   const phoneInput = document.getElementById("phone");
   const mediumSelect = document.getElementById("medium");
-  const googleBtn = document.getElementById("googleLogin");
+  const googleBtn = document.getElementById("googleBtn");
 
   function checkInputs() {
     if (nameInput.value && phoneInput.value && mediumSelect.value) {
@@ -127,30 +114,25 @@
   phoneInput.addEventListener("input", checkInputs);
   mediumSelect.addEventListener("change", checkInputs);
 
-  googleBtn.addEventListener("click", () => {
-    auth.signInWithRedictor(provider)
-      auth.getRedirectResult().then((result) => {
-  if (result.user) {
-    window.location.href = "courses.html";
-  }
-});
+  googleBtn.addEventListener("click", async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
 
+      localStorage.setItem("studentName", nameInput.value);
+      localStorage.setItem("studentPhone", phoneInput.value);
+      localStorage.setItem("studentMedium", mediumSelect.value);
+      localStorage.setItem("studentEmail", user.email);
 
-        // Save user details in localStorage
-        localStorage.setItem("studentName", nameInput.value);
-        localStorage.setItem("studentPhone", phoneInput.value);
-        localStorage.setItem("studentMedium", mediumSelect.value);
-        localStorage.setItem("studentEmail", user.email);
+      window.location.href = "courses.html";
 
-        // Redirect to Course Page
-        window.location.href = "courses.html";
-      })
-      .catch((error) => {
-        alert("Login Failed: " + error.message);
-      });
+    } catch (error) {
+      alert("Login Failed: " + error.message);
+      console.error(error);
+    }
   });
+
 </script>
 
 </body>
 </html>
-
