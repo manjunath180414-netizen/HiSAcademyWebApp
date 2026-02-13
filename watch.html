@@ -4,6 +4,11 @@
   <title>Watch Class</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
   <style>
     body{
       margin:0;
@@ -43,21 +48,46 @@
   <source id="videoSource" src="" type="video/mp4">
 </video>
 
-<button onclick="goBack()">⬅ Back to Classes</button>
+<button onclick="goBack()">⬅ Back</button>
 
 <script>
-  const params = new URLSearchParams(window.location.search);
-  const video = params.get("video");
-  const title = params.get("title");
 
-  document.getElementById("videoTitle").innerText = title;
-  document.getElementById("videoSource").src = video;
+  const firebaseConfig = {
+    apiKey: "AIzaSyCehyZQukDfslKTY_u9yXcUrzGtMNHvuPA",
+    authDomain: "his-academy.firebaseapp.com",
+    projectId: "his-academy",
+    storageBucket: "his-academy.firebasestorage.app",
+    messagingSenderId: "573278549264",
+    appId: "1:573278549264:web:ca2ff160b5a100cc7d2195"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      db.collection("students").doc(user.uid).get()
+      .then(doc => {
+        if (!doc.exists || doc.data().paymentStatus !== "paid") {
+          window.location.href = "courses.html";
+        }
+      });
+    } else {
+      window.location.href = "login.html";
+    }
+  });
+
+  const params = new URLSearchParams(window.location.search);
+  document.getElementById("videoTitle").innerText = params.get("title");
+  document.getElementById("videoSource").src = params.get("video");
 
   function goBack(){
     window.location.href="recorded.html";
   }
+
 </script>
 
 </body>
 </html>
-
