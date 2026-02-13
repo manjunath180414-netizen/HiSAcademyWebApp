@@ -387,25 +387,21 @@ console.log("Payment Status:", data.paymentStatus);
 // Auto horizontal scroll
 
 // Netflix Style Infinite Carousel
-const track = document.querySelector('.carousel-track');
-let slides = Array.from(document.querySelectorAll('.carousel-item'));
+{const track = document.querySelector(".carousel-track");
+const slides = document.querySelectorAll(".carousel-item");
 
-let currentIndex = 0;
+let index = 0;
 
-if(track){
+function autoSlide() {
+  index++;
+  if (index >= slides.length) {
+    index = 0;
+  }
+  track.style.transform = `translateX(-${index * 100}%)`;
+}
 
-  const firstClone = slides[0].cloneNode(true);
-  const lastClone = slides[slides.length - 1].cloneNode(true);
+setInterval(autoSlide, 3000);
 
-  track.appendChild(firstClone);
-  track.insertBefore(lastClone, slides[0]);
-
-  slides = Array.from(document.querySelectorAll('.carousel-item'));
-
-  track.style.transform = `translateX(-100%)`;
-  currentIndex = 1;
-
-  function updateSlidePosition() {
     track.style.transform = `translateX(-${currentIndex * 100}%)`;
     slides.forEach(slide => slide.classList.remove("active"));
     slides[currentIndex].classList.add("active");
