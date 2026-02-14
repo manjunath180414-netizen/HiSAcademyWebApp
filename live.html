@@ -212,7 +212,7 @@
       db.collection("students").doc(user.uid).get()
       .then(doc=>{
         if(!doc.exists || doc.data().paymentStatus !== "paid"){
-          window.location.href="courses.html";
+          window.location.href="profile.html";
         }
 
         document.getElementById("watermarkText").innerText =
