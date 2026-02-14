@@ -150,6 +150,9 @@
       </div>
       <p id="progressText"></p>
     </div>
+<button class="btn secondary-btn" onclick="logoutUser()">
+  Logout
+</button>
 
     <button id="actionBtn" class="btn primary-btn"></button>
   </div>
@@ -277,6 +280,15 @@
   function goLive(){ window.location.href="live.html"; }
   function goNotes(){ window.location.href="notes.html"; }
   function goRecorded(){ window.location.href="recorded.html"; }
+function logoutUser(){
+  firebase.auth().signOut()
+  .then(() => {
+    window.location.href = "login.html";
+  })
+  .catch((error) => {
+    alert("Error logging out. Try again.");
+  });
+}
 
 </script>
 
