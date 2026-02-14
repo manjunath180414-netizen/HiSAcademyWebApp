@@ -213,6 +213,22 @@
 
   // Initial Load
   loadSubjects();
+  <script>
+
+  // Firebase config
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // 🔒 Add this protection here
+
+  firebase.auth().onAuthStateChanged(...);
+
+  // Then your existing notes logic below
+  loadSubjects();
+
+</script>
+
 
 </script>
 
