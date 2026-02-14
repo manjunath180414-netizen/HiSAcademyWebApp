@@ -1,7 +1,7 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
-  <title>HiS Academy Login</title>
+  <title>Login - HIS Academy</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Firebase -->
@@ -10,249 +10,169 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
-    body {
-      margin: 0;
-      font-family: Poppins, sans-serif;
-      background: linear-gradient(135deg,#0f0f1a,#1a1a2e);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: white;
+    body{
+      margin:0;
+      font-family:Poppins, sans-serif;
+      background:linear-gradient(135deg,#0f0f1a,#1a1a2e);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+      color:white;
     }
 
-    .container {
-      width: 90%;
-      max-width: 400px;
-      background: #111827;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 0 30px rgba(255,215,0,0.15);
+    .login-box{
+      background:#111827;
+      padding:30px;
+      border-radius:20px;
+      width:90%;
+      max-width:400px;
+      text-align:center;
+      box-shadow:0 0 30px rgba(255,215,0,0.2);
     }
 
-    h2 {
-      text-align: center;
-      color: #FFD700;
-      margin-bottom: 25px;
+    h2{
+      color:#FFD700;
+      margin-bottom:20px;
     }
 
-    input, select {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border-radius: 10px;
-      border: none;
-      background: #1f2937;
-      color: white;
-      outline: none;
+    input{
+      width:100%;
+      padding:12px;
+      margin-bottom:15px;
+      border-radius:8px;
+      border:none;
+      outline:none;
     }
 
-    input::placeholder {
-      color: #aaa;
+    button{
+      width:100%;
+      padding:12px;
+      border-radius:8px;
+      border:none;
+      font-weight:bold;
+      cursor:pointer;
+      background:#FFD700;
+      color:black;
     }
 
-    .google-btn {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      background: #FFD700;
-      color: black;
-      font-weight: bold;
-      cursor: pointer;
-      display: none;
-      margin-bottom: 10px;
-    }
-
-    .already-btn {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #FFD700;
-      background: #1f2937;
-      color: #FFD700;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .already-btn:hover {
-      background: #FFD700;
-      color: black;
+    .error{
+      color:#ff4d4d;
+      margin-top:10px;
+      font-size:14px;
     }
 
   </style>
 </head>
 <body>
 
-<div class="container">
+<div class="login-box">
+  <h2>HIS Academy Login</h2>
 
-  <h2>Welcome to HiS Academy</h2>
+  <input type="text" id="name" placeholder="Enter Name">
+  <input type="text" id="phone" placeholder="Enter Phone Number">
+  <input type="text" id="medium" placeholder="Medium (English/Kannada)">
 
-  <input type="text" id="name" placeholder="Enter Your Name">
-  <input type="tel" id="phone" placeholder="Enter Phone Number">
+  <button onclick="googleLogin()">Login with Google</button>
 
-  <select id="medium">
-    <option value="">Select Medium</option>
-    <option value="English">English</option>
-    <option value="Kannada">Kannada</option>
-  </select>
-
-  <button id="googleBtn" class="google-btn">
-    Login with Google
-  </button>
-
-  <button id="alreadyPaidBtn" class="already-btn">
-    Already Paid? Start Learning
-  </button>
-
+  <div class="error" id="errorMsg"></div>
 </div>
 
 <script>
 
-  // 🔥 Firebase Config
   const firebaseConfig = {
     apiKey: "AIzaSyCehyZQukDfslKTY_u9yXcUrzGtMNHvuPA",
     authDomain: "his-academy.firebaseapp.com",
-    projectId: "his-academy",
-    storageBucket: "his-academy.firebasestorage.app",
-    messagingSenderId: "573278549264",
-    appId: "1:573278549264:web:ca2ff160b5a100cc7d2195",
-    measurementId: "G-8WPMS7H33F"
+    projectId: "his-academy"
   };
-// Generate or Get Device ID
-function getDeviceId() {
-  let deviceId = localStorage.getItem("deviceId");
-
-  if (!deviceId) {
-    deviceId = "device_" + Math.random().toString(36).substr(2, 16);
-    localStorage.setItem("deviceId", deviceId);
-  }
-
-  return deviceId;
-}
 
   firebase.initializeApp(firebaseConfig);
-
   const auth = firebase.auth();
   const db = firebase.firestore();
-  const provider = new firebase.auth.GoogleAuthProvider();
 
-  const nameInput = document.getElementById("name");
-  const phoneInput = document.getElementById("phone");
-  const mediumSelect = document.getElementById("medium");
-  const googleBtn = document.getElementById("googleBtn");
-  const alreadyBtn = document.getElementById("alreadyPaidBtn");
+  // Generate or get device ID
+  function getDeviceId(){
+    let deviceId = localStorage.getItem("deviceId");
 
-  // Show Google button only if form filled
-  function checkInputs() {
-    if (nameInput.value && phoneInput.value && mediumSelect.value) {
-      googleBtn.style.display = "block";
-    } else {
-      googleBtn.style.display = "none";
+    if(!deviceId){
+      deviceId = "device_" + Math.random().toString(36).substr(2, 20);
+      localStorage.setItem("deviceId", deviceId);
     }
+
+    return deviceId;
   }
 
-  nameInput.addEventListener("input", checkInputs);
-  phoneInput.addEventListener("input", checkInputs);
-  mediumSelect.addEventListener("change", checkInputs);
+  async function googleLogin(){
 
-  // 🔐 Google Login
-  googleBtn.addEventListener("click", () => {
+    const name = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const medium = document.getElementById("medium").value.trim();
+    const errorMsg = document.getElementById("errorMsg");
 
-    auth.signInWithPopup(provider)
-    .then((result) => {
-auth.onAuthStateChanged(async (user) => {
-  if (user) {
+    errorMsg.innerText = "";
 
-    const deviceId = getDeviceId();
-    const userRef = db.collection("students").doc(user.uid);
-    const doc = await userRef.get();
-
-    if (!doc.exists) {
-      alert("Account not found.");
-      firebase.auth().signOut();
+    if(!name || !phone || !medium){
+      errorMsg.innerText = "Please fill all details before login.";
       return;
     }
 
-    const data = doc.data();
+    try{
 
-    // First time login → save device
-    if (!data.deviceId) {
-      await userRef.update({
-        deviceId: deviceId
-      });
-
-      window.location.href = "profile.html";
-    }
-    else if (data.deviceId === deviceId) {
-      // Same device → allow
-      window.location.href = "profile.html";
-    }
-    else {
-      // Different device → block
-      alert("This account is already logged in on another device. You cannot login.");
-      firebase.auth().signOut();
-    }
-
-  }
-});
-
+      const provider = new firebase.auth.GoogleAuthProvider();
+      const result = await auth.signInWithPopup(provider);
       const user = result.user;
 
-      db.collection("students").doc(user.uid).set({
-        name: nameInput.value,
-        phone: phoneInput.value,
-        email: user.email,
-        medium: mediumSelect.value,
-        enrolledCourse: "",
-        paymentStatus: "pending",
-        totalStudyHours: 0,
-        joinedOn: firebase.firestore.FieldValue.serverTimestamp()
-      })
-      .then(() => {
-        window.location.href = "courses.html";
-      });
+      const deviceId = getDeviceId();
+      const userRef = db.collection("students").doc(user.uid);
+      const doc = await userRef.get();
 
-    })
-    .catch((error) => {
-      alert(error.message);
-    });
+      if(!doc.exists){
 
-  });
-
-  // 🔥 Already Paid Button Logic
-  alreadyBtn.addEventListener("click", () => {
-
-    auth.onAuthStateChanged((user) => {
-
-      if (user) {
-
-        db.collection("students").doc(user.uid).get()
-        .then((doc) => {
-
-          if (!doc.exists) {
-            alert("No student record found.");
-            return;
-          }
-
-          const data = doc.data();
-
-          if (data.paymentStatus === "paid") {
-            window.location.href = "dashboard.html";
-          } else {
-            alert("Kindly make the payment and enroll in the course.");
-            window.location.href = "courses.html";
-          }
-
+        // First time registration
+        await userRef.set({
+          name: name,
+          phone: phone,
+          medium: medium,
+          email: user.email,
+          paymentStatus: "not_paid",
+          deviceId: deviceId,
+          joinedOn: firebase.firestore.FieldValue.serverTimestamp(),
+          totalStudyHours: 0
         });
 
-      } else {
-        alert("Please login with Google first.");
+        window.location.href = "profile.html";
+        return;
       }
 
-    });
+      const data = doc.data();
 
-  });
+      // If no device bound yet
+      if(!data.deviceId){
+
+        await userRef.update({
+          deviceId: deviceId
+        });
+
+        window.location.href = "profile.html";
+        return;
+      }
+
+      // If same device
+      if(data.deviceId === deviceId){
+        window.location.href = "profile.html";
+        return;
+      }
+
+      // If different device → block
+      alert("This account is already logged in on another device.");
+      await auth.signOut();
+
+    }
+    catch(error){
+      console.error(error);
+      errorMsg.innerText = "Login failed. Please try again.";
+    }
+  }
 
 </script>
 
