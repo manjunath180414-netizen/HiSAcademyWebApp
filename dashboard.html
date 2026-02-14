@@ -66,6 +66,11 @@
       border-radius:15px;
       text-align:center;
     }
+.slider{
+  display:flex;
+  overflow:hidden;
+  gap:15px;
+}
 
     .slide img{
     width:100%;
@@ -321,28 +326,32 @@
   function callNow(){
     window.location.href="tel:02269719375";
   }
-// 🔥 Proper Auto Slide (No Half Cut)
+// 🔥 Netflix Style Infinite Smooth Scroll
 const slider = document.querySelector('.slider');
-const slides = document.querySelectorAll('.slide');
 
-let currentIndex = 0;
+if (slider) {
 
-setInterval(() => {
-  if(slider && slides.length > 0){
+  // Clone slides for infinite effect
+  slider.innerHTML += slider.innerHTML;
 
-    currentIndex++;
+  let scrollSpeed = 0.5; // lower = slower
+  let scrollPosition = 0;
 
-    if(currentIndex >= slides.length){
-      currentIndex = 0;
+  function autoScroll() {
+    scrollPosition += scrollSpeed;
+    slider.scrollLeft = scrollPosition;
+
+    // Reset when half reached
+    if (scrollPosition >= slider.scrollWidth / 2) {
+      scrollPosition = 0;
     }
 
-    slider.scrollTo({
-      left: slides[currentIndex].offsetLeft,
-      behavior: "smooth"
-    });
-
+    requestAnimationFrame(autoScroll);
   }
-}, 4000);
+
+  autoScroll();
+}
+
 
 
 </script>
