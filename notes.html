@@ -148,35 +148,60 @@
   const contentArea = document.getElementById("contentArea");
   const pageTitle = document.getElementById("pageTitle");
   const pdfContainer = document.getElementById("pdfContainer");
+const subjects = {
+  "Kannada": 21,
+  "English": 20,
+  "Hindi": 19,
+  "Maths": 14,
+  "Science": 13,
+  "Social": 33
+};
 
-  const subjects = ["Kannada","English","Hindi","Maths","Science","Social"];
 
   function loadSubjects(){
     contentArea.innerHTML="";
     pdfContainer.innerHTML="";
     pageTitle.innerText="Select Subject";
 
-    subjects.forEach(subject=>{
-      const card=document.createElement("div");
-      card.className="card";
-      card.innerHTML=`<div class="card-title">${subject}</div>`;
-      card.onclick=()=>loadChapters(subject);
-      contentArea.appendChild(card);
-    });
+    function loadSubjects(){
+  contentArea.innerHTML="";
+  pdfContainer.innerHTML="";
+  pageTitle.innerText="Select Subject";
+
+  Object.keys(subjects).forEach(subject=>{
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML=`<div class="card-title">${subject}</div>`;
+    card.onclick=()=>loadChapters(subject);
+    contentArea.appendChild(card);
+  });
+}
+
   }
 
-  function loadChapters(subject){
-    contentArea.innerHTML="";
-    pdfContainer.innerHTML="";
-    pageTitle.innerText=subject+" - Select Chapter";
+  
+    function loadChapters(subject){
+  contentArea.innerHTML="";
+  pdfContainer.innerHTML="";
+  pageTitle.innerText=subject+" - Select Chapter";
 
-    for(let i=1;i<=33;i++){
-      const card=document.createElement("div");
-      card.className="card";
-      card.innerHTML=`<div class="card-title">Chapter ${i}</div>`;
-      card.onclick=()=>openPDF(subject.toLowerCase()+"_ch"+i+".pdf");
-      contentArea.appendChild(card);
-    }
+  const totalChapters = subjects[subject];
+
+  for(let i=1;i<=totalChapters;i++){
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML=`<div class="card-title">Chapter ${i}</div>`;
+    card.onclick=()=>openPDF(subject.toLowerCase()+"_ch"+i+".pdf");
+    contentArea.appendChild(card);
+  }
+
+  const backBtn=document.createElement("button");
+  backBtn.className="back-btn";
+  backBtn.innerText="⬅ Back";
+  backBtn.onclick=loadSubjects;
+  contentArea.appendChild(backBtn);
+}
+
 
     const backBtn=document.createElement("button");
     backBtn.className="back-btn";
