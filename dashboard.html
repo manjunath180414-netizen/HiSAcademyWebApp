@@ -311,10 +311,10 @@
     window.location.href="recorded.html";
   }
 
-  function playLive(){
-    document.getElementById("liveVideo").innerHTML =
-      '<video controls width="100%"><source src="live.mp4" type="video/mp4"></video><p>Live: Maths Strategy Session</p>';
-  }
+  <button class="button live-btn" onclick="openLive()">
+  🔴 Watch Live Classes
+</button>
+
 
   function callNow(){
     window.location.href="tel:02269719375";
@@ -336,6 +336,9 @@ setInterval(() => {
     });
   }
 }, 4000);
+function openLive(){
+  window.location.href = "live.html";
+}
 
 </script>
 
