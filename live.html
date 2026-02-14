@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Class - HiS Academy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    body{
+      margin:0;
+      font-family:Poppins, sans-serif;
+      background:linear-gradient(135deg,#0f0f1a,#1a1a2e);
+      color:white;
+    }
+
+    .header{
+      background:#111827;
+      padding:15px;
+      text-align:center;
+      font-size:20px;
+      font-weight:bold;
+      color:#FFD700;
+      box-shadow:0 0 20px rgba(255,215,0,0.2);
+    }
+
+    .container{
+      padding:15px;
+      max-width:1100px;
+      margin:auto;
+      position:relative;
+    }
+
+    .card{
+      background:#111827;
+      border-radius:15px;
+      padding:15px;
+      margin-bottom:20px;
+      box-shadow:0 0 25px rgba(255,215,0,0.15);
+      position:relative;
+    }
+
+    iframe{
+      width:100%;
+      height:400px;
+      border-radius:12px;
+    }
+
+    .watermark{
+      position:absolute;
+      top:30px;
+      left:30px;
+      color:rgba(255,255,255,0.2);
+      font-size:18px;
+      font-weight:bold;
+      pointer-events:none;
+      animation:moveWatermark 8s infinite alternate;
+      z-index:999;
+    }
+
+    @keyframes moveWatermark{
+      0% { transform: translate(0,0); }
+      100% { transform: translate(200px,150px); }
+    }
+
+    .btn{
+      width:100%;
+      padding:12px;
+      border-radius:10px;
+      border:none;
+      font-weight:bold;
+      cursor:pointer;
+      background:#FFD700;
+      color:black;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="header">
+  H I S Academy 🔴 Live Class
+</div>
+
+<div class="container">
+
+  <!-- Watermark -->
+  <div class="watermark" id="watermarkText">
+    Loading...
+  </div>
+
+  <div class="card">
+
+    <!-- Replace Vimeo link here -->
+    <iframe 
+      src="https://player.vimeo.com/video/000000000?controls=1&title=0&byline=0&portrait=0"
+      frameborder="0"
+      allow="autoplay; fullscreen; picture-in-picture"
+      allowfullscreen>
+    </iframe>
+
+  </div>
+
+  <button class="btn" onclick="goBack()">
+    ⬅ Back to Dashboard
+  </button>
+
+</div>
+
+<script>
+
+  // Disable right click
+  document.addEventListener("contextmenu", event => event.preventDefault());
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCehyZQukDfslKTY_u9yXcUrzGtMNHvuPA",
+    authDomain: "his-academy.firebaseapp.com",
+    projectId: "his-academy"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // Protect Page + Add Watermark
+  auth.onAuthStateChanged((user)=>{
+    if(user){
+      db.collection("students").doc(user.uid).get()
+      .then(doc=>{
+        if(!doc.exists || doc.data().paymentStatus !== "paid"){
+          window.location.href="courses.html";
+        }
+
+        const phone = doc.data().phone;
+        const email = doc.data().email;
+
+        document.getElementById("watermarkText").innerText =
+          phone + " | " + email;
+
+      });
+    } else {
+      window.location.href="login.html";
+    }
+  });
+
+  function goBack(){
+    window.location.href="dashboard.html";
+  }
+
+</script>
+
+</body>
+</html>
