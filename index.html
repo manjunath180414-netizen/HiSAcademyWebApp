@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html>
 <head>
   <title>HiS Academy Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Firebase (Compat Version Only) -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -14,11 +14,11 @@
       margin: 0;
       font-family: Poppins, sans-serif;
       background: linear-gradient(135deg,#0f0f1a,#1a1a2e);
-      color: white;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      color: white;
     }
 
     .container {
@@ -27,7 +27,7 @@
       background: #111827;
       padding: 30px;
       border-radius: 20px;
-      box-shadow: 0 0 30px rgba(255, 204, 0, 0.2);
+      box-shadow: 0 0 30px rgba(255,215,0,0.15);
     }
 
     h2 {
@@ -47,7 +47,11 @@
       outline: none;
     }
 
-    button {
+    input::placeholder {
+      color: #aaa;
+    }
+
+    .google-btn {
       width: 100%;
       padding: 12px;
       border-radius: 10px;
@@ -57,10 +61,23 @@
       font-weight: bold;
       cursor: pointer;
       display: none;
+      margin-bottom: 10px;
     }
 
-    button:hover {
-      background: #ffcc00;
+    .already-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #FFD700;
+      background: #1f2937;
+      color: #FFD700;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .already-btn:hover {
+      background: #FFD700;
+      color: black;
     }
 
   </style>
@@ -68,6 +85,7 @@
 <body>
 
 <div class="container">
+
   <h2>Welcome to HiS Academy</h2>
 
   <input type="text" id="name" placeholder="Enter Your Name">
@@ -79,21 +97,16 @@
     <option value="Kannada">Kannada</option>
   </select>
 
-  <button id="googleBtn">Login with Google</button>
-<div>
-<button> id="alreadyPaidBtn" style="
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border-radius:10px;
-  border:1px solid #FFD700;
-  background:#1f2937;
-  color:#FFD700;
-  font-weight:bold;
-  cursor:pointer;">
-  Already Paid? Start Learning
-</button>
+  <button id="googleBtn" class="google-btn">
+    Login with Google
+  </button>
+
+  <button id="alreadyPaidBtn" class="already-btn">
+    Already Paid? Start Learning
+  </button>
+
 </div>
+
 <script>
 
   // 🔥 Firebase Config
@@ -107,7 +120,6 @@
     measurementId: "G-8WPMS7H33F"
   };
 
-  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
 
   const auth = firebase.auth();
@@ -118,8 +130,9 @@
   const phoneInput = document.getElementById("phone");
   const mediumSelect = document.getElementById("medium");
   const googleBtn = document.getElementById("googleBtn");
+  const alreadyBtn = document.getElementById("alreadyPaidBtn");
 
-  // Show Google button only if all fields filled
+  // Show Google button only if form filled
   function checkInputs() {
     if (nameInput.value && phoneInput.value && mediumSelect.value) {
       googleBtn.style.display = "block";
@@ -132,73 +145,68 @@
   phoneInput.addEventListener("input", checkInputs);
   mediumSelect.addEventListener("change", checkInputs);
 
-  // Google Login
+  // 🔐 Google Login
   googleBtn.addEventListener("click", () => {
 
-  auth.signInWithPopup(provider)
-  .then((result) => {
+    auth.signInWithPopup(provider)
+    .then((result) => {
 
-    const user = result.user;
-    console.log("Google login success");
+      const user = result.user;
 
-    db.collection("students").doc(user.uid).set({
-      name: nameInput.value,
-      phone: phoneInput.value,
-      email: user.email,
-      medium: mediumSelect.value,
-      enrolledCourse: "",
-      paymentStatus: "pending",
-      totalStudyHours: 0,
-      joinedOn: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    .then(() => {
-      console.log("Firestore saved successfully");
-      window.location.href = "courses.html";
+      db.collection("students").doc(user.uid).set({
+        name: nameInput.value,
+        phone: phoneInput.value,
+        email: user.email,
+        medium: mediumSelect.value,
+        enrolledCourse: "",
+        paymentStatus: "pending",
+        totalStudyHours: 0,
+        joinedOn: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(() => {
+        window.location.href = "courses.html";
+      });
+
     })
     .catch((error) => {
-      console.error("Firestore Error:", error);
       alert(error.message);
     });
 
-  })
-  .catch((error) => {
-    console.error("Login Error:", error);
-    alert(error.message);
   });
 
-});
-document.getElementById("alreadyPaidBtn").addEventListener("click", () => {
+  // 🔥 Already Paid Button Logic
+  alreadyBtn.addEventListener("click", () => {
 
-  auth.onAuthStateChanged((user) => {
+    auth.onAuthStateChanged((user) => {
 
-    if (user) {
+      if (user) {
 
-      db.collection("students").doc(user.uid).get()
-      .then((doc) => {
+        db.collection("students").doc(user.uid).get()
+        .then((doc) => {
 
-        if (!doc.exists) {
-          alert("No student record found. Please login properly.");
-          return;
-        }
+          if (!doc.exists) {
+            alert("No student record found.");
+            return;
+          }
 
-        const data = doc.data();
+          const data = doc.data();
 
-        if (data.paymentStatus === "paid") {
-          window.location.href = "dashboard.html";
-        } else {
-          alert("Kindly make the payment and enroll in the course.");
-          window.location.href = "courses.html";
-        }
+          if (data.paymentStatus === "paid") {
+            window.location.href = "dashboard.html";
+          } else {
+            alert("Kindly make the payment and enroll in the course.");
+            window.location.href = "courses.html";
+          }
 
-      });
+        });
 
-    } else {
-      alert("Please login with Google first.");
-    }
+      } else {
+        alert("Please login with Google first.");
+      }
+
+    });
 
   });
-
-});
 
 </script>
 
