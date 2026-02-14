@@ -1,4 +1,4 @@
-<!DOCTYPE html
+<!DOCTYPE html>
 <html>
 <head>
   <title>HiS Academy Dashboard</title>
@@ -142,12 +142,6 @@
 <body>
 
 <div class="container">
-
-  <h2>Hi, <span id="studentName">Student</span> 👋</h2>
-
-  <div class="banner">
-    🚀 Mega Scholarship Test Coming Soon | Stay Prepared!
-  </div>
 <!-- Motivation Section -->
 <div class="card">
   <h3 class="highlight">🔥 Stay Focused. Stay Hungry.</h3>
@@ -181,6 +175,12 @@
 
   </div>
 </div>
+
+  <h2>Hi, <span id="studentName">Student</span> 👋</h2>
+
+  <div class="banner">
+    🚀 Mega Scholarship Test Coming Soon | Stay Prepared!
+  </div>
 
   <div class="card">
     <p>Total Hours Finished: <span class="highlight" id="totalHours">0</span> Hours</p>
@@ -219,10 +219,9 @@
     </div>
   </div>
 
-  <button class="button live-btn" onclick="openLive()">
-  🔴 Watch Live Classes
-</button>
-
+  <button class="button live-btn" onclick="playLive()">
+    ▶ Watch Live Classes
+  </button>
 
   <div id="liveVideo"></div>
 
@@ -248,10 +247,8 @@
     appId: "1:573278549264:web:ca2ff160b5a100cc7d2195",
     measurementId: "G-8WPMS7H33F"
   };
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
 
+  firebase.initializeApp(firebaseConfig);
 
   const auth = firebase.auth();
   const db = firebase.firestore();
@@ -314,9 +311,9 @@ if (!firebase.apps.length) {
     window.location.href="recorded.html";
   }
 
-  function openLive(){
-  window.location.href = "live.html";
-}
+  function playLive(){
+    document.getElementById("liveVideo").innerHTML =
+      '<video controls width="100%"><source src="live.mp4" type="video/mp4"></video><p>Live: Maths Strategy Session</p>';
   }
 
   function callNow(){
@@ -344,4 +341,3 @@ setInterval(() => {
 
 </body>
 </html>
-
