@@ -87,6 +87,15 @@
       color:white;
       border:1px solid #FFD700;
     }
+<!-- Master Plan Button -->
+<div class="card">
+  <h3 style="color:#FFD700;">📘 SSLC 2026 Master Plan</h3>
+  <p>Your 346 Hour Structured Study Calendar</p>
+
+  <button class="master-btn" onclick="openTimetable()">
+    View Study Timetable
+  </button>
+</div>
 
     /* Bottom Navigation */
     .bottom-nav{
@@ -118,6 +127,22 @@
     .nav-item.active{
       color:#FFD700;
     }
+.master-btn{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:10px;
+  border:none;
+  font-weight:bold;
+  background:#FFD700;
+  color:black;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.master-btn:hover{
+  transform:translateY(-3px);
+}
 
   </style>
 </head>
@@ -289,6 +314,9 @@ function logoutUser(){
   .catch((error) => {
     alert("Error logging out. Try again.");
   });
+}
+function openTimetable(){
+  window.location.href = "timetable.html";
 }
 
 </script>
