@@ -153,6 +153,21 @@
       </div>
       <p id="progressText"></p>
     </div>
+    <button onclick="openTimetable()" 
+style="
+width:100%;
+padding:14px;
+margin-top:12px;
+border-radius:12px;
+border:none;
+background:#1f2937;
+color:#FFD700;
+font-weight:bold;
+cursor:pointer;
+border:2px solid #FFD700;">
+📅 Study Master Plan
+</button>
+
 <button class="btn secondary-btn" onclick="logoutUser()">
   Logout
 </button>
@@ -293,6 +308,9 @@ function logoutUser(){
   .catch((error) => {
     alert("Error logging out. Try again.");
   });
+}
+function openTimetable(){
+  window.location.href = "timetable.html";
 }
 
 </script>
