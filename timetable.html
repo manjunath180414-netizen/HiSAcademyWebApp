@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Study Master Plan - HIS Academy</title>
+  <title>SSLC 2026 Study Master Plan</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Firebase -->
@@ -34,22 +34,6 @@
       border-radius:18px;
       margin-bottom:20px;
       box-shadow:0 0 25px rgba(255,215,0,0.15);
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      margin-top:10px;
-    }
-
-    table th, table td{
-      padding:10px;
-      border-bottom:1px solid #333;
-      text-align:left;
-    }
-
-    table th{
-      color:#FFD700;
     }
 
     .calendar-grid{
@@ -89,6 +73,22 @@
       color:#FFD700;
     }
 
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+    }
+
+    table th, table td{
+      padding:10px;
+      border-bottom:1px solid #333;
+      text-align:left;
+    }
+
+    table th{
+      color:#FFD700;
+    }
+
     /* Bottom Navigation */
     .bottom-nav{
       position:fixed;
@@ -125,14 +125,12 @@
 
   <div id="mainContent" style="display:none;">
 
-    <!-- Master Plan Header -->
     <div class="card">
       <h2>📘 SSLC 2026 – STUDY MASTER PLAN</h2>
-      <p>March 1 – April 1</p>
+      <p>March 1 – April 2</p>
       <p><strong>Total Study Hours:</strong> 346 hrs</p>
     </div>
 
-    <!-- Exam Timetable -->
     <div class="card">
       <h3>🗓 Exam Timetable</h3>
       <table>
@@ -146,13 +144,11 @@
       </table>
     </div>
 
-    <!-- Calendar Grid -->
     <div class="card">
       <h3>📅 Click a Date</h3>
       <div id="calendar" class="calendar-grid"></div>
     </div>
 
-    <!-- Day Details -->
     <div class="card" id="dayDetails" style="display:none;">
       <h3 id="selectedDate"></h3>
       <div id="sessions"></div>
@@ -161,7 +157,6 @@
   </div>
 </div>
 
-<!-- Bottom Navigation -->
 <div class="bottom-nav">
   <div class="nav-item" onclick="goDashboard()"><span>🏠</span>Dashboard</div>
   <div class="nav-item" onclick="goLive()"><span>🔴</span>Live</div>
@@ -182,7 +177,6 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// 🔒 Access Lock
 auth.onAuthStateChanged(async(user)=>{
   if(!user){ window.location.href="login.html"; return; }
 
@@ -198,54 +192,153 @@ auth.onAuthStateChanged(async(user)=>{
   generateCalendar();
 });
 
-// 🔥 Calendar Generation
 function generateCalendar(){
   const calendar = document.getElementById("calendar");
-  for(let i=1;i<=31;i++){
-    const div=document.createElement("div");
-    div.className="date-card";
-    div.innerText="March "+i;
-    div.onclick=()=>showDay("March "+i);
-    calendar.appendChild(div);
+
+  for(let d=1; d<=31; d++){
+    createDateCard("March", d);
   }
-  const april=document.createElement("div");
-  april.className="date-card";
-  april.innerText="April 1";
-  april.onclick=()=>showDay("April 1");
-  calendar.appendChild(april);
+
+  createDateCard("April", 1);
+  createDateCard("April", 2);
 }
 
-// 🔥 Example Day Data (Expandable Later)
-const schedule = {
-  "March 1":[
-    {title:"Morning (4–10)", subjects:["Kannada","Science"]},
-    {title:"Mid (11–2:30)", subjects:["Mathematics","Social"]},
-    {title:"Evening (4–10:30)", subjects:["English","Hindi","Science Revision"]}
-  ],
-  "March 18":[
-    {title:"Morning", subjects:["Light Kannada Revision"]},
-    {title:"Evening (2 hrs)", subjects:["Science"]}
-  ]
-};
+function createDateCard(month, day){
+  const div=document.createElement("div");
+  div.className="date-card";
+  div.innerText=month+" "+day;
+  div.onclick=()=>showDay(month, day);
+  document.getElementById("calendar").appendChild(div);
+}
 
-// 🔥 Show Day Details
-function showDay(date){
-  document.getElementById("selectedDate").innerText=date;
+function showDay(month, day){
+
+  document.getElementById("selectedDate").innerText = month+" "+day;
   const sessionsDiv=document.getElementById("sessions");
   sessionsDiv.innerHTML="";
   document.getElementById("dayDetails").style.display="block";
 
-  const dayData=schedule[date];
-  if(!dayData){
-    sessionsDiv.innerHTML="<p>Structured rotation plan applies.</p>";
-    return;
+  let sessions=[];
+  const dateObj = new Date(2026, month==="March"?2:3, day);
+  const weekday = dateObj.getDay();
+
+  // Phase 1 (March 1–17)
+  if(month==="March" && day<=17){
+
+    if(weekday===0){ // Sunday
+      sessions=[
+        {title:"Morning (4–10)", subjects:["Kannada (Heavy)","Science (Heavy)"]},
+        {title:"Mid (11–2:30)", subjects:["Mathematics","Social"]},
+        {title:"Evening (4–10:30)", subjects:["English","Hindi","Science Revision"]}
+      ];
+    }
+    else if(weekday===6){ // Saturday
+      sessions=[
+        {title:"Morning", subjects:["Kannada","Science"]},
+        {title:"Afternoon + Evening", subjects:["Mathematics","Social","English"]}
+      ];
+    }
+    else{
+      sessions=[
+        {title:"Morning (4:30–7:30)", subjects:["Kannada","Science"]},
+        {title:"Evening (5–11:30)", subjects:["Mathematics","Social","English / Hindi Rotation"]}
+      ];
+    }
   }
 
-  dayData.forEach(session=>{
+  else if(month==="March" && day===18){
+    sessions=[
+      {title:"Morning", subjects:["Light Kannada Revision"]},
+      {title:"Evening (2 hrs)", subjects:["Science"]}
+    ];
+  }
+
+  else if(month==="March" && day>=19 && day<=22){
+    sessions=[
+      {title:"Morning (4–9)", subjects:["Science"]},
+      {title:"Mid (10:30–1:30)", subjects:["Science"]},
+      {title:"Afternoon (2:30–5)", subjects:["Mathematics"]},
+      {title:"Evening (6–11)", subjects:["English","Social"]}
+    ];
+  }
+
+  else if(month==="March" && day===23){
+    sessions=[
+      {title:"Morning", subjects:["Science Revision"]},
+      {title:"Evening (2 hrs)", subjects:["English"]}
+    ];
+  }
+
+  else if(month==="March" && day===24){
+    sessions=[
+      {title:"Morning", subjects:["English"]},
+      {title:"Mid", subjects:["English"]},
+      {title:"Evening", subjects:["Mathematics","Hindi"]}
+    ];
+  }
+
+  else if(month==="March" && day===25){
+    sessions=[
+      {title:"Exam Day", subjects:["English Exam"]},
+      {title:"Evening (2 hrs)", subjects:["Mathematics"]}
+    ];
+  }
+
+  else if(month==="March" && (day===26 || day===27)){
+    sessions=[
+      {title:"Morning", subjects:["Mathematics"]},
+      {title:"Mid", subjects:["Mathematics"]},
+      {title:"Evening", subjects:["Hindi","Social"]}
+    ];
+  }
+
+  else if(month==="March" && day===28){
+    sessions=[
+      {title:"Exam Day", subjects:["Mathematics Exam"]},
+      {title:"Evening", subjects:["Hindi"]}
+    ];
+  }
+
+  else if(month==="March" && day===29){
+    sessions=[
+      {title:"Morning", subjects:["Hindi"]},
+      {title:"Evening", subjects:["Social"]}
+    ];
+  }
+
+  else if(month==="March" && day===30){
+    sessions=[
+      {title:"Exam Day", subjects:["Hindi Exam"]},
+      {title:"Evening", subjects:["Social"]}
+    ];
+  }
+
+  else if(month==="March" && day===31){
+    sessions=[
+      {title:"All Sessions", subjects:["Social Science"]}
+    ];
+  }
+
+  else if(month==="April" && day===1){
+    sessions=[
+      {title:"Morning", subjects:["Social Science"]},
+      {title:"Evening", subjects:["Light Full Syllabus Recap"]}
+    ];
+  }
+
+  else if(month==="April" && day===2){
+    sessions=[
+      {title:"Exam Day", subjects:["Social Science Exam"]}
+    ];
+  }
+
+  sessions.forEach(session=>{
     const div=document.createElement("div");
     div.className="session";
-    div.innerHTML=`<div class="session-title">${session.title}</div>
-                   <div>${session.subjects.join(", ")}</div>`;
+    div.innerHTML=`
+      <div class="session-title">${session.title}</div>
+      <div>${session.subjects.join(", ")}</div>
+    `;
     sessionsDiv.appendChild(div);
   });
 }
@@ -259,4 +352,3 @@ function goProfile(){ window.location.href="profile.html"; }
 </script>
 </body>
 </html>
-
