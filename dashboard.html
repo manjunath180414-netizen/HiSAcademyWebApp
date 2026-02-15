@@ -188,6 +188,22 @@
 .nav-item.active{
   color:#FFD700;
 }
+.master-btn{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:10px;
+  border:none;
+  font-weight:bold;
+  background:#FFD700;
+  color:black;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.master-btn:hover{
+  transform:translateY(-3px);
+}
 
   </style>
 </head>
@@ -239,6 +255,15 @@
 
     </div>
   </div>
+<!-- Master Plan Button -->
+<div class="card">
+  <h3 style="color:#FFD700;">📘 SSLC 2026 Master Plan</h3>
+  <p>Your 346 Hour Structured Study Calendar</p>
+
+  <button class="master-btn" onclick="openTimetable()">
+    View Study Timetable
+  </button>
+</div>
 
   <!-- Batches -->
   <div class="card">
@@ -401,6 +426,10 @@ function goNotes(){
 
 function goProfile(){
   window.location.href = "profile.html";
+}
+
+function openTimetable(){
+  window.location.href = "timetable.html";
 }
 
 
