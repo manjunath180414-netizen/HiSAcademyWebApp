@@ -1,8 +1,14 @@
+
   <!DOCTYPE html>
 <html>
 <head>
   <title>Notes - HIS Academy</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
     body{
@@ -50,7 +56,7 @@
     }
 
     .back-btn{
-      margin-top:15px;
+      margin-top:20px;
       background:#FFD700;
       color:black;
       border:none;
@@ -66,6 +72,13 @@
       border-radius:12px;
       margin-top:20px;
       background:white;
+    }
+
+    .loading{
+      text-align:center;
+      margin-top:50px;
+      font-size:18px;
+      color:#FFD700;
     }
 
     /* Bottom Navigation */
@@ -105,51 +118,56 @@
 
 <div class="container">
 
-  <h2 id="pageTitle">Select Subject</h2>
+  <div id="loading" class="loading">Checking access...</div>
 
-  <div id="contentArea" class="grid"></div>
-
-  <div id="pdfContainer"></div>
+  <div id="mainContent" style="display:none;">
+    <h2 id="pageTitle">Select Subject</h2>
+    <div id="contentArea" class="grid"></div>
+    <div id="pdfContainer"></div>
+  </div>
 
 </div>
 
 <!-- Bottom Navigation -->
 <div class="bottom-nav">
-
   <div class="nav-item" onclick="goDashboard()">
-    <span>🏠</span>
-    Dashboard
+    <span>🏠</span>Dashboard
   </div>
 
   <div class="nav-item" onclick="goLive()">
-    <span>🔴</span>
-    Live
+    <span>🔴</span>Live
   </div>
 
   <div class="nav-item active">
-    <span>📄</span>
-    Notes
+    <span>📄</span>Notes
   </div>
 
   <div class="nav-item" onclick="goRecorded()">
-    <span>🎥</span>
-    Recorded
+    <span>🎥</span>Recorded
   </div>
 
   <div class="nav-item" onclick="goProfile()">
-    <span>👤</span>
-    Profile
+    <span>👤</span>Profile
   </div>
-
 </div>
 
 <script>
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCehyZQukDfslKTY_u9yXcUrzGtMNHvuPA",
+    authDomain: "his-academy.firebaseapp.com",
+    projectId: "his-academy"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
   const contentArea = document.getElementById("contentArea");
   const pageTitle = document.getElementById("pageTitle");
   const pdfContainer = document.getElementById("pdfContainer");
 
-  // 🔥 Exact Chapter Counts
+  // Exact Chapter Counts
   const subjects = {
     Kannada: 21,
     English: 20,
@@ -158,6 +176,35 @@
     Science: 13,
     Social: 33
   };
+
+  // 🔒 Access Control
+  auth.onAuthStateChanged(async (user)=>{
+    if(!user){
+      window.location.href="login.html";
+      return;
+    }
+
+    const doc = await db.collection("students").doc(user.uid).get();
+
+    if(!doc.exists){
+      window.location.href="login.html";
+      return;
+    }
+
+    const data = doc.data();
+
+    if(data.paymentStatus !== "paid"){
+      alert("Please enroll to access notes.");
+      window.location.href="profile.html";
+      return;
+    }
+
+    // Access granted
+    document.getElementById("loading").style.display="none";
+    document.getElementById("mainContent").style.display="block";
+
+    loadSubjects();
+  });
 
   function loadSubjects(){
     contentArea.innerHTML="";
@@ -178,9 +225,9 @@
     pdfContainer.innerHTML="";
     pageTitle.innerText=subject+" - Select Chapter";
 
-    let totalChapters = subjects[subject];
+    let total = subjects[subject];
 
-    for(let i=1;i<=totalChapters;i++){
+    for(let i=1;i<=total;i++){
       const card=document.createElement("div");
       card.className="card";
       card.innerHTML=`<div class="card-title">Chapter ${i}</div>`;
@@ -205,28 +252,10 @@
     `;
   }
 
-  // Navigation
-  function goDashboard(){ window.location.href="profile.html"; }
+  function goDashboard(){ window.location.href="dashboard.html"; }
   function goLive(){ window.location.href="live.html"; }
   function goRecorded(){ window.location.href="recorded.html"; }
   function goProfile(){ window.location.href="profile.html"; }
-
-  // Initial Load
-  loadSubjects();
-
-
-  // Firebase config
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  // 🔒 Add this protection here
-
-  firebase.auth().onAuthStateChanged(...);
-
-  // Then your existing notes logic below
-  loadSubjects();
-
 
 </script>
 
