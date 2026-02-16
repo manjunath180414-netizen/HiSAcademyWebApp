@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>HIS Academy Admin</title>
+  <title>HIS Academy - Admin Panel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Firebase -->
@@ -10,7 +10,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
-
     body{
       margin:0;
       font-family:Poppins, sans-serif;
@@ -18,8 +17,7 @@
       color:white;
     }
 
-    /* ACCESS SCREEN */
-    .center{
+    .center-screen{
       height:100vh;
       display:flex;
       justify-content:center;
@@ -60,7 +58,6 @@
       cursor:pointer;
     }
 
-    /* ADMIN PANEL */
     #adminPanel{
       display:none;
       padding:30px;
@@ -97,10 +94,10 @@
 
     .requested{
       background:#00aa55;
-      margin-left:6px;
+      margin-left:5px;
     }
 
-    /* Toggle */
+    /* Toggle Switch */
     .switch {
       position: relative;
       display: inline-block;
@@ -114,7 +111,7 @@
       position: absolute;
       cursor: pointer;
       top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #ccc;
+      background-color: #444;
       transition: .4s;
       border-radius: 24px;
     }
@@ -139,23 +136,42 @@
       transform: translateX(26px);
     }
 
+    .top-bar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .logout{
+      background:#aa0000;
+      color:white;
+      padding:8px 15px;
+      border-radius:8px;
+      cursor:pointer;
+      border:none;
+    }
+
   </style>
 </head>
 <body>
 
 <!-- ACCESS SCREEN -->
-<div id="accessScreen" class="center">
+<div id="accessScreen" class="center-screen">
   <div class="card">
     <h2>🔐 Administrative Access</h2>
-    <p>Restricted Area</p>
+    <p>Enter Master Key to continue</p>
     <input type="password" id="secretInput" placeholder="Enter Master Key">
-    <button onclick="checkSecret()">Verify</button>
+    <button onclick="checkSecret()">Verify Access</button>
   </div>
 </div>
 
-<!-- ADMIN DASHBOARD -->
+<!-- ADMIN PANEL -->
 <div id="adminPanel">
-  <h2>📊 HIS Academy Admin Dashboard</h2>
+
+  <div class="top-bar">
+    <h2>📊 HIS Academy Admin Dashboard</h2>
+    <button class="logout" onclick="logout()">Logout</button>
+  </div>
 
   <table>
     <thead>
@@ -163,7 +179,6 @@
         <th>Name</th>
         <th>Phone</th>
         <th>Email</th>
-        <th>Joined</th>
         <th>Status</th>
         <th>Approve</th>
       </tr>
@@ -176,7 +191,7 @@
 <script>
 
 const SECRET_KEY = "Gokulgroups";
-const ADMIN_EMAIL = "hisacademyofficial@gmail.com; // 🔴 CHANGE THIS
+const ADMIN_EMAIL = "youradminemail@gmail.com"; // 🔴 CHANGE THIS
 
 const firebaseConfig = {
   apiKey: "AIzaSyCehyZQukDfslKTY_u9yXcUrzGtMNHvuPA",
@@ -214,61 +229,63 @@ function validateAdmin(){
   });
 }
 
-async function loadStudents(){
+function loadStudents(){
+
   const table=document.getElementById("studentTable");
-  table.innerHTML="";
 
-  const snapshot = await db.collection("students").orderBy("joinedOn","desc").get();
+  // 🔥 REAL-TIME LISTENER
+  db.collection("students").onSnapshot(snapshot=>{
+    table.innerHTML="";
 
-  snapshot.forEach(doc=>{
-    const data=doc.data();
-    const tr=document.createElement("tr");
+    snapshot.forEach(doc=>{
+      const data=doc.data();
+      const tr=document.createElement("tr");
 
-    let statusClass="notpaid";
-    let statusText="Not Paid";
+      let statusClass="notpaid";
+      if(data.paymentStatus==="paid") statusClass="paid";
+      else if(data.paymentStatus==="pending") statusClass="pending";
 
-    if(data.paymentStatus==="paid"){
-      statusClass="paid";
-      statusText="Paid";
-    }
-    else if(data.paymentStatus==="pending"){
-      statusClass="pending";
-      statusText="Pending";
-    }
+      let requestedBadge="";
+      if(data.requestSubmitted){
+        requestedBadge=`<span class="badge requested">Requested</span>`;
+      }
 
-    let requestedBadge="";
-    if(data.requestSubmitted){
-      requestedBadge=`<span class="badge requested">Requested</span>`;
-    }
+      let toggle="";
+      if(data.paymentStatus!=="paid"){
+        toggle=`
+          <label class="switch">
+            <input type="checkbox" onchange="confirmPayment('${doc.id}')">
+            <span class="slider"></span>
+          </label>
+        `;
+      }
 
-    let toggle="";
-    if(data.paymentStatus!=="paid"){
-      toggle=`
-        <label class="switch">
-          <input type="checkbox" onchange="confirmPayment('${doc.id}')">
-          <span class="slider"></span>
-        </label>
+      tr.innerHTML=`
+        <td>${data.name || ""} ${requestedBadge}</td>
+        <td>${data.phone || ""}</td>
+        <td>${data.email || ""}</td>
+        <td><span class="badge ${statusClass}">
+          ${data.paymentStatus || "not_paid"}
+        </span></td>
+        <td>${toggle}</td>
       `;
-    }
 
-    tr.innerHTML=`
-      <td>${data.name || ""} ${requestedBadge}</td>
-      <td>${data.phone || ""}</td>
-      <td>${data.email || ""}</td>
-      <td>${data.joinedOn ? new Date(data.joinedOn.seconds*1000).toLocaleDateString() : "-"}</td>
-      <td><span class="badge ${statusClass}">${statusText}</span></td>
-      <td>${toggle}</td>
-    `;
+      table.appendChild(tr);
+    });
 
-    table.appendChild(tr);
   });
+
 }
 
 async function confirmPayment(uid){
   await db.collection("students").doc(uid).update({
     paymentStatus:"paid"
   });
-  loadStudents();
+}
+
+function logout(){
+  auth.signOut();
+  window.location.href="login.html";
 }
 
 </script>
