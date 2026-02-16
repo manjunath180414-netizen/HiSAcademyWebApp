@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Restricted Area</title>
+  <title>HIS Academy - Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -9,37 +9,61 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
+
     body{
       margin:0;
-      font-family:Arial, sans-serif;
-      background:#111;
+      font-family:Poppins, sans-serif;
+      background:linear-gradient(135deg,#0f0f1a,#1a1a2e);
       color:white;
+    }
+
+    .center-screen{
+      height:100vh;
       display:flex;
       justify-content:center;
       align-items:center;
-      height:100vh;
     }
 
-    .login-box{
+    .card{
+      background:#111827;
+      padding:40px;
+      border-radius:20px;
+      box-shadow:0 0 30px rgba(255,215,0,0.2);
+      width:350px;
       text-align:center;
     }
 
+    h2{
+      color:#FFD700;
+      margin-bottom:10px;
+    }
+
     input{
-      padding:10px;
-      width:250px;
-      margin-top:10px;
+      width:100%;
+      padding:12px;
+      margin-top:15px;
+      border-radius:8px;
+      border:none;
+      outline:none;
     }
 
     button{
-      padding:8px 15px;
-      margin-top:10px;
+      margin-top:15px;
+      width:100%;
+      padding:12px;
+      border-radius:10px;
+      border:none;
+      font-weight:bold;
+      background:#FFD700;
+      color:black;
       cursor:pointer;
     }
 
     #adminPanel{
       display:none;
-      padding:20px;
-      width:100%;
+      padding:30px;
+      max-width:1200px;
+      margin:auto;
     }
 
     table{
@@ -49,39 +73,90 @@
     }
 
     th,td{
-      border:1px solid #444;
-      padding:10px;
+      padding:12px;
+      border-bottom:1px solid #333;
       text-align:left;
     }
 
     th{
-      background:#222;
+      color:#FFD700;
     }
 
-    .btn{
-      padding:5px 10px;
-      cursor:pointer;
+    .badge{
+      padding:5px 12px;
+      border-radius:20px;
+      font-size:12px;
+      font-weight:bold;
     }
 
-    .confirm{
-      background:green;
-      color:white;
-      border:none;
+    .paid{ background:#00aa55; }
+    .pending{ background:#cc8800; }
+    .notpaid{ background:#aa0000; }
+
+    .requested{
+      background:#00aa55;
+      margin-left:5px;
+    }
+
+    /* Toggle Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .switch input { display:none; }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #FFD700;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
     }
 
   </style>
 </head>
 <body>
 
-<div id="accessScreen" class="login-box">
-  <h2>Are You My Boss?</h2>
-  <input type="password" id="secretInput" placeholder="Enter Secret Key">
-  <br>
-  <button onclick="checkSecret()">Enter</button>
+<!-- ACCESS SCREEN -->
+<div id="accessScreen" class="center-screen">
+  <div class="card">
+    <h2>🔐 Administrative Access</h2>
+    <p>This area is restricted.</p>
+    <input type="password" id="secretInput" placeholder="Enter Master Key">
+    <button onclick="checkSecret()">Verify Access</button>
+  </div>
 </div>
 
+<!-- ADMIN PANEL -->
 <div id="adminPanel">
-  <h2>HIS Academy Admin Dashboard</h2>
+  <h2>📊 HIS Academy Admin Dashboard</h2>
   <table>
     <thead>
       <tr>
@@ -89,7 +164,7 @@
         <th>Phone</th>
         <th>Email</th>
         <th>Status</th>
-        <th>Action</th>
+        <th>Approve</th>
       </tr>
     </thead>
     <tbody id="studentTable"></tbody>
@@ -99,7 +174,7 @@
 <script>
 
 const SECRET_KEY = "Gokulgroups";
-const ADMIN_EMAIL = "hisacademyofficial@gmail.com"; // replace
+const ADMIN_EMAIL = "youradminemail@gmail.com"; // change
 
 const firebaseConfig = {
   apiKey: "AIzaSyCehyZQukDfslKTY_u9yXcUrzGtMNHvuPA",
@@ -113,57 +188,64 @@ const db = firebase.firestore();
 
 function checkSecret(){
   const input=document.getElementById("secretInput").value;
-
   if(input === SECRET_KEY){
     document.getElementById("accessScreen").style.display="none";
     document.getElementById("adminPanel").style.display="block";
-    checkAdmin();
-  }
-  else{
-    alert("Access Denied");
+    validateAdmin();
+  } else {
+    alert("Invalid Key");
   }
 }
 
-function checkAdmin(){
-  auth.onAuthStateChanged(async(user)=>{
+function validateAdmin(){
+  auth.onAuthStateChanged(user=>{
     if(!user){
-      alert("Login Required");
       window.location.href="login.html";
       return;
     }
-
     if(user.email !== ADMIN_EMAIL){
-      alert("Not Authorized");
+      alert("Unauthorized Access");
       window.location.href="profile.html";
       return;
     }
-
     loadStudents();
   });
 }
 
 async function loadStudents(){
-
   const table=document.getElementById("studentTable");
   table.innerHTML="";
-
   const snapshot = await db.collection("students").get();
 
   snapshot.forEach(doc=>{
     const data=doc.data();
     const tr=document.createElement("tr");
 
-    let action="";
-    if(data.paymentStatus !== "paid"){
-      action=`<button class="btn confirm" onclick="confirmPayment('${doc.id}')">Confirm</button>`;
+    let statusClass="notpaid";
+    if(data.paymentStatus==="paid") statusClass="paid";
+    else if(data.paymentStatus==="pending") statusClass="pending";
+
+    let requestedBadge="";
+    if(data.requestSubmitted){
+      requestedBadge=`<span class="badge requested">Requested</span>`;
+    }
+
+    let toggle="";
+    if(data.paymentStatus!=="paid"){
+      toggle=`
+        <label class="switch">
+          <input type="checkbox" onchange="confirmPayment('${doc.id}')">
+          <span class="slider"></span>
+        </label>
+      `;
     }
 
     tr.innerHTML=`
-      <td>${data.name || ""}</td>
-      <td>${data.phone || ""}</td>
-      <td>${data.email || ""}</td>
-      <td>${data.paymentStatus || "not_paid"}</td>
-      <td>${action}</td>
+      <td>${data.name} ${requestedBadge}</td>
+      <td>${data.phone}</td>
+      <td>${data.email}</td>
+      <td><span class="badge ${statusClass}">${data.paymentStatus || "not_paid"}</span></td>
+      <td>${toggle}</td>
     `;
 
     table.appendChild(tr);
@@ -174,7 +256,6 @@ async function confirmPayment(uid){
   await db.collection("students").doc(uid).update({
     paymentStatus:"paid"
   });
-  alert("Payment Confirmed");
   loadStudents();
 }
 
