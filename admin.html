@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel - HIS Academy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    body{
+      margin:0;
+      font-family:Poppins, sans-serif;
+      background:linear-gradient(135deg,#0f0f1a,#1a1a2e);
+      color:white;
+    }
+
+    .container{
+      padding:20px;
+      max-width:1200px;
+      margin:auto;
+    }
+
+    h2{
+      color:#FFD700;
+    }
+
+    .card{
+      background:#111827;
+      padding:20px;
+      border-radius:15px;
+      margin-bottom:20px;
+      box-shadow:0 0 20px rgba(255,215,0,0.15);
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:15px;
+    }
+
+    th, td{
+      padding:12px;
+      border-bottom:1px solid #333;
+      text-align:left;
+      font-size:14px;
+    }
+
+    th{
+      color:#FFD700;
+    }
+
+    .badge{
+      padding:5px 10px;
+      border-radius:20px;
+      font-size:12px;
+      font-weight:bold;
+    }
+
+    .paid{ background:#00aa55; }
+    .notpaid{ background:#aa0000; }
+    .pending{ background:#cc8800; }
+    .requested{
+      background:#00aa55;
+      margin-left:5px;
+    }
+
+    .btn{
+      padding:6px 12px;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-weight:bold;
+    }
+
+    .confirm{
+      background:#FFD700;
+      color:black;
+    }
+
+    .logout{
+      background:#aa0000;
+      color:white;
+      float:right;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h2>📊 HIS Academy Admin Panel</h2>
+
+  <button class="btn logout" onclick="logout()">Logout</button>
+
+  <div class="card">
+    <h3>All Students</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Joined</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="studentTable"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+
+const ADMIN_EMAIL = "ADMIN_EMAIL_HERE"; // 🔴 Replace this
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCehyZQukDfslKTY_u9yXcUrzGtMNHvuPA",
+  authDomain: "his-academy.firebaseapp.com",
+  projectId: "his-academy"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+auth.onAuthStateChanged(async(user)=>{
+
+  if(!user){
+    window.location.href="login.html";
+    return;
+  }
+
+  if(user.email !== ADMIN_EMAIL){
+    alert("Access Denied");
+    window.location.href="profile.html";
+    return;
+  }
+
+  loadStudents();
+});
+
+async function loadStudents(){
+
+  const table=document.getElementById("studentTable");
+  table.innerHTML="";
+
+  const snapshot = await db.collection("students").orderBy("joinedOn","desc").get();
+
+  snapshot.forEach(doc=>{
+    const data=doc.data();
+    const tr=document.createElement("tr");
+
+    let statusBadge="";
+    let actionBtn="";
+
+    if(data.paymentStatus==="paid"){
+      statusBadge=`<span class="badge paid">PAID</span>`;
+    }
+    else if(data.paymentStatus==="pending"){
+      statusBadge=`<span class="badge pending">PENDING</span>`;
+      actionBtn=`<button class="btn confirm" onclick="confirmPayment('${doc.id}')">Confirm Payment</button>`;
+    }
+    else{
+      statusBadge=`<span class="badge notpaid">NOT PAID</span>`;
+    }
+
+    let requestedBadge="";
+    if(data.requestSubmitted){
+      requestedBadge=`<span class="badge requested">Requested Access</span>`;
+    }
+
+    tr.innerHTML=`
+      <td>${data.name} ${requestedBadge}</td>
+      <td>${data.phone}</td>
+      <td>${data.email}</td>
+      <td>${data.joinedOn ? new Date(data.joinedOn.seconds*1000).toLocaleDateString() : "-"}</td>
+      <td>${statusBadge}</td>
+      <td>${actionBtn}</td>
+    `;
+
+    table.appendChild(tr);
+  });
+
+}
+
+async function confirmPayment(uid){
+
+  await db.collection("students").doc(uid).update({
+    paymentStatus:"paid"
+  });
+
+  alert("Payment Confirmed ✅");
+  loadStudents();
+}
+
+function logout(){
+  auth.signOut();
+  window.location.href="login.html";
+}
+
+</script>
+
+</body>
+</html>
