@@ -159,7 +159,9 @@
         email: user.email,
         medium: mediumSelect.value,
         enrolledCourse: "",
-        paymentStatus: "pending",
+        paymentStatus: "not_paid",
+requestSubmitted: false,
+
         totalStudyHours: 0,
         joinedOn: firebase.firestore.FieldValue.serverTimestamp()
       })
