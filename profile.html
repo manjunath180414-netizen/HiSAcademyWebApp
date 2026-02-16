@@ -275,9 +275,11 @@ border:2px solid #FFD700;">
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
+let currentUser;
 
   auth.onAuthStateChanged((user)=>{
     if(user){
+currentUser = user;
 
       db.collection("students").doc(user.uid).get()
       .then(doc=>{
@@ -286,11 +288,13 @@ border:2px solid #FFD700;">
         }
 
         const data = doc.data();
+        
 
         document.getElementById("name").innerText = data.name;
         document.getElementById("email").innerText = data.email;
         document.getElementById("phone").innerText = data.phone;
         document.getElementById("medium").innerText = data.medium;
+renderPaymentUI(data);
 
         if(data.joinedOn){
           document.getElementById("joined").innerText =
@@ -359,22 +363,6 @@ function logoutUser(){
 function openTimetable(){
   window.location.href = "timetable.html";
 }
-let currentUser;
-
-auth.onAuthStateChanged(async(user)=>{
-  if(!user){
-    window.location.href="login.html";
-    return;
-  }
-
-  currentUser = user;
-
-  const doc = await db.collection("students").doc(user.uid).get();
-  const data = doc.data();
-
-  renderPaymentUI(data);
-});
-
 
 function renderPaymentUI(data){
 
