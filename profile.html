@@ -326,47 +326,6 @@ function logoutUser(){
 function openTimetable(){
   window.location.href = "timetable.html";
 }
-let currentUser;
-
-auth.onAuthStateChanged(async(user)=>{
-  if(!user){
-    window.location.href="login.html";
-    return;
-  }
-
-  currentUser = user;
-
-  const doc = await db.collection("students").doc(user.uid).get();
-  const data = doc.data();
-
-  // If already requested
-  if(data.paymentStatus === "pending"){
-    document.getElementById("verifyBtn").innerText =
-      "⏳ Verification Requested (Waiting for Approval)";
-    document.getElementById("verifyBtn").disabled = true;
-  }
-
-  // If already paid
-  if(data.paymentStatus === "paid"){
-    document.getElementById("verifyBtn").style.display="none";
-  }
-});
-
-document.getElementById("verifyBtn").addEventListener("click", async ()=>{
-
-  await db.collection("students").doc(currentUser.uid).update({
-    paymentStatus:"pending",
-    requestSubmitted:true,
-    requestTime: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  alert("Your request has been submitted. It may take up to 12 hours.");
-
-  document.getElementById("verifyBtn").innerText =
-    "⏳ Verification Requested (Waiting for Approval)";
-  document.getElementById("verifyBtn").disabled = true;
-
-});
 
 </script>
 
