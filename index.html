@@ -152,22 +152,49 @@
     .then((result) => {
 
       const user = result.user;
+// Generate referral code
+const referralCode = "HIS" + Math.floor(100000 + Math.random() * 900000);
 
-      db.collection("students").doc(user.uid).set({
-        name: nameInput.value,
-        phone: phoneInput.value,
-        email: user.email,
-        medium: mediumSelect.value,
-        enrolledCourse: "",
-        paymentStatus: "not_paid",
-requestSubmitted: false,
+// Get referral from URL
+const urlParams = new URLSearchParams(window.location.search);
+const referredBy = urlParams.get("ref");
 
-        totalStudyHours: 0,
-        joinedOn: firebase.firestore.FieldValue.serverTimestamp()
-      })
-      .then(() => {
-        window.location.href = "courses.html";
+db.collection("students").doc(user.uid).set({
+  name: nameInput.value,
+  phone: phoneInput.value,
+  email: user.email,
+  medium: mediumSelect.value,
+  enrolledCourse: "",
+  paymentStatus: "not_paid",
+  requestSubmitted: false,
+
+  referralCode: referralCode,
+  referredBy: referredBy || null,
+  referralCount: 0,
+  unlockRequested: false,
+  approved: false,
+
+  totalStudyHours: 0,
+  joinedOn: firebase.firestore.FieldValue.serverTimestamp()
+})
+.then(async () => {
+
+  // 🔥 Increase referral count of referrer
+  if (referredBy) {
+    const snapshot = await db.collection("students")
+      .where("referralCode", "==", referredBy)
+      .get();
+
+    snapshot.forEach(async (doc) => {
+      const data = doc.data();
+      await db.collection("students").doc(doc.id).update({
+        referralCount: (data.referralCount || 0) + 1
       });
+    });
+  }
+
+  window.location.href = "courses.html";
+});
 
     })
     .catch((error) => {
