@@ -292,7 +292,7 @@ function shareLoginLink(){
 
   const referralLink =
     window.location.origin +
-    "/index.html?ref=" +
+    "/HiSAcademyWebApp/index.html?ref=" +
     studentData.referralCode;
 
   const message =
@@ -307,7 +307,7 @@ function shareLoginLink(){
   encodeURIComponent(message);
 
   window.open(whatsappURL, "_blank");
-}
+  }  
 
 
 async function requestUnlock(){
