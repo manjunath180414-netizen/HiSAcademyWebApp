@@ -149,79 +149,71 @@ const referredBy = urlParams.get("ref");
   mediumSelect.addEventListener("change", checkInputs);
 
   // 🔐 Google Login
-  googleBtn.addEventListener("click", () => {
+  googleBtn.addEventListener("click", async () => {
 
-    auth.signInWithPopup(provider)
-    .then((result) => {
+  try {
 
-      const user = result.user;
-// Generate referral code
-const referralCode = "HIS" + Math.floor(100000 + Math.random() * 900000);
+    const result = await auth.signInWithPopup(provider);
+    const user = result.user;
 
-// Get referral from URL
-const urlParams = new URLSearchParams(window.location.search);
-const referredBy = urlParams.get("ref");
+    const docRef = db.collection("students").doc(user.uid);
+    const docSnap = await docRef.get();
 
-auth.signInWithPopup(provider)
-.then(async (result) => {
+    // Only create record if new student
+    if (!docSnap.exists) {
 
-  const user = result.user;
+      const referralCode = "HIS" + Math.floor(100000 + Math.random() * 900000);
 
-  const docRef = db.collection("students").doc(user.uid);
-  const docSnap = await docRef.get();
+      await docRef.set({
+        name: nameInput.value,
+        phone: phoneInput.value,
+        email: user.email,
+        medium: mediumSelect.value,
+        enrolledCourse: "",
+        paymentStatus: "not_paid",
+        requestSubmitted: false,
 
-  // 🔥 Only create new record if not exists
-  if (!docSnap.exists) {
+        referralCode: referralCode,
+        referredBy: referredBy || null,
+        referralCount: 0,
+        unlockRequested: false,
+        approved: false,
 
-    // Generate referral code
-    const referralCode = "HIS" + Math.floor(100000 + Math.random() * 900000);
-
-    await docRef.set({
-      name: nameInput.value,
-      phone: phoneInput.value,
-      email: user.email,
-      medium: mediumSelect.value,
-      enrolledCourse: "",
-      paymentStatus: "not_paid",
-      requestSubmitted: false,
-
-      referralCode: referralCode,
-      referredBy: referredBy || null,
-      referralCount: 0,
-      unlockRequested: false,
-      approved: false,
-
-      totalStudyHours: 0,
-      joinedOn: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    // 🔥 Increase referral count of referrer
-    if (referredBy) {
-
-      const snapshot = await db.collection("students")
-        .where("referralCode", "==", referredBy)
-        .get();
-
-      snapshot.forEach(async (doc) => {
-
-        // ❌ Prevent self referral
-        if (doc.id !== user.uid) {
-
-          const data = doc.data();
-
-          await db.collection("students").doc(doc.id).update({
-            referralCount: (data.referralCount || 0) + 1
-          });
-
-        }
+        totalStudyHours: 0,
+        joinedOn: firebase.firestore.FieldValue.serverTimestamp()
       });
+
+      // Increase referral count
+      if (referredBy) {
+
+        const snapshot = await db.collection("students")
+          .where("referralCode", "==", referredBy)
+          .get();
+
+        snapshot.forEach(async (doc) => {
+
+          if (doc.id !== user.uid) {
+
+            const data = doc.data();
+
+            await db.collection("students").doc(doc.id).update({
+              referralCount: (data.referralCount || 0) + 1
+            });
+
+          }
+
+        });
+      }
     }
+
+    window.location.href = "courses.html";
+
+  } catch (error) {
+    alert(error.message);
   }
 
-  // After login go to course page
-  window.location.href = "courses.html";
+});
 
-})
 .catch((error) => {
   alert(error.message);
 });
@@ -231,14 +223,7 @@ auth.signInWithPopup(provider)
     });
 
   });
-    if (referredBy) {
-
-  const snapshot = await db.collection("students")
-    .where("referralCode", "==", referredBy)
-    .get();
-
-  snapshot.forEach(async (doc) => {
-    const data = doc.data();
+ 
 
     // ❌ prevent self referral
     if(doc.id !== user.uid){
